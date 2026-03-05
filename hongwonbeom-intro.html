@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>홍원범 | UX 스페셜리스트</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-solid: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #5c5c5c;
+      --accent: #2d5a4a;
+      --accent-light: #4a7c6a;
+      --border: rgba(232, 230, 225, 0.8);
+      --shadow: 0 4px 24px rgba(0,0,0,0.06);
+      --shadow-hover: 0 12px 40px rgba(45, 90, 74, 0.12);
+      --radius: 12px;
+      --font-sans: 'Noto Sans KR', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --ease-out-smooth: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* 그라데이션 배경 레이어 */
+    .bg-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(165deg, #f5f3ef 0%, #eef0eb 25%, #e8ebe6 50%, #e2e8e2 75%, #dce5df 100%);
+      background-attachment: scroll;
+    }
+    .bg-gradient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .bg-gradient-orb-1 {
+      width: min(80vw, 600px);
+      height: min(80vw, 600px);
+      top: -20%;
+      right: -15%;
+      background: radial-gradient(circle, rgba(45, 90, 74, 0.15) 0%, transparent 70%);
+    }
+    .bg-gradient-orb-2 {
+      width: min(60vw, 400px);
+      height: min(60vw, 400px);
+      bottom: 10%;
+      left: -10%;
+      background: radial-gradient(circle, rgba(74, 124, 106, 0.12) 0%, transparent 70%);
+    }
+    .bg-gradient-orb-3 {
+      width: min(50vw, 320px);
+      height: min(50vw, 320px);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(200, 210, 200, 0.25) 0%, transparent 70%);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: transparent;
+      color: var(--text);
+      line-height: 1.7;
+      font-weight: 400;
+      overflow-x: hidden;
+    }
+
+    /* 스크롤 진행 표시 (UX: 읽기 진행도) */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      z-index: 100;
+      transition: width 0.12s var(--ease-out-smooth);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-progress { transition: none; }
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(180deg, rgba(245,243,239,0.6) 0%, rgba(238,240,235,0.4) 50%, transparent 100%);
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      opacity: 0.6;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s var(--ease-out-smooth) forwards;
+    }
+    .hero .subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s var(--ease-out-smooth) 0.15s forwards;
+    }
+    /* UX 스페셜리스트 강조: 그라데이션 언더라인 애니메이션 */
+    .subtitle .ux-badge {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 600;
+      position: relative;
+    }
+    .subtitle .ux-badge::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 1px;
+      animation: underlineGrow 1.2s var(--ease-out-smooth) 0.5s forwards;
+    }
+    @keyframes underlineGrow {
+      to { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .subtitle .ux-badge::after { animation: none; width: 100%; }
+    }
+    .hero .education {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s var(--ease-out-smooth) 0.3s forwards;
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      animation: bounce 2s var(--ease-in-out) infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-hint { animation: none; }
+    }
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* Layout */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.5s var(--ease-out-smooth);
+    }
+    section:last-of-type {
+      border-bottom: none;
+    }
+    /* 스크롤 시 현재 섹션 포커스 (미세한 배경 변화) */
+    section.section-in-view {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 1.75rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    /* Career timeline */
+    .timeline {
+      list-style: none;
+    }
+    .timeline li {
+      display: flex;
+      gap: 1.5rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      align-items: baseline;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: transform 0.3s var(--ease-out-smooth), background 0.3s var(--ease-out-smooth);
+    }
+    .timeline li.visible {
+      animation: fadeUp 0.5s var(--ease-out-smooth) forwards;
+    }
+    .timeline li:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .timeline .year {
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      min-width: 100px;
+    }
+    .timeline .role {
+      font-weight: 500;
+      color: var(--text);
+    }
+    .timeline .company {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Strengths cards */
+    .strengths {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .strength-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      padding: 1.75rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: transform 0.35s var(--ease-out-smooth), box-shadow 0.35s var(--ease-out-smooth), border-color 0.35s var(--ease-out-smooth);
+    }
+    .strength-card.visible {
+      animation: fadeUp 0.6s var(--ease-out-smooth) forwards;
+    }
+    .strength-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(45, 90, 74, 0.25);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .strength-card:hover { transform: none; }
+    }
+    .strength-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .strength-card p {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.75;
+    }
+
+    /* Projects */
+    .project {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: transform 0.35s var(--ease-out-smooth), box-shadow 0.35s var(--ease-out-smooth), border-color 0.35s var(--ease-out-smooth);
+    }
+    .project.visible {
+      animation: fadeUp 0.6s var(--ease-out-smooth) forwards;
+    }
+    .project:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(45, 90, 74, 0.25);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .project:hover { transform: none; }
+    }
+    .project:last-child {
+      margin-bottom: 0;
+    }
+    .project h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .project .meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .project .problem,
+    .project .solution {
+      margin-top: 1rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--border);
+    }
+    .project .problem strong,
+    .project .solution strong {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .project .problem p,
+    .project .solution p {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-top: 0.25rem;
+    }
+
+    /* Closing */
+    .closing {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .closing p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* 포커스 가시성 (접근성·UX) */
+    .strength-card:focus-visible,
+    .project:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 600px) {
+      .timeline li {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .timeline .year {
+        min-width: auto;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient" aria-hidden="true"></div>
+  <div class="bg-gradient-orb bg-gradient-orb-1" aria-hidden="true"></div>
+  <div class="bg-gradient-orb bg-gradient-orb-2" aria-hidden="true"></div>
+  <div class="bg-gradient-orb bg-gradient-orb-3" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" role="progressbar" aria-label="페이지 읽기 진행도"></div>
+
+  <header class="hero">
+    <h1>홍원범</h1>
+    <p class="subtitle"><span class="ux-badge">UX 스페셜리스트</span> · 전략부터 구현까지</p>
+    <p class="education">서울대학교 인류학과 학사 / 문화인류학 석사</p>
+    <span class="scroll-hint">아래로 스크롤</span>
+  </header>
+
+  <main>
+    <section class="career">
+      <div class="container">
+        <span class="section-label">Career</span>
+        <h2 class="section-title">경력</h2>
+        <ul class="timeline" id="timeline">
+          <li><span class="year">2019 – 현재</span><span class="company">카카오</span> <span class="role">/ UX</span></li>
+          <li><span class="year">2017 – 2019</span><span class="company">빈브라더스</span> <span class="role">/ 브랜딩·IT</span></li>
+          <li><span class="year">2012 – 2017</span><span class="company">LINE</span> <span class="role">/ PM·서비스기획</span></li>
+          <li><span class="year">2008 – 2012</span><span class="company">네이버</span> <span class="role">/ UX</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="strengths-section">
+      <div class="container">
+        <span class="section-label">Strengths</span>
+        <h2 class="section-title">강점</h2>
+        <div class="strengths">
+          <div class="strength-card" data-delay="0">
+            <h3>🎯 전략부터 구현까지</h3>
+            <p>UX의 방향성과 전략을 수립하는 것부터 실제 구현과 실행까지 모두 커버할 수 있습니다. 깊은 고민과 넓은 발산을 통해 문제 해결을 위한 비전을 제시하고, 구현 가능성을 갖춘 현실적인 해결책을 내놓습니다.</p>
+          </div>
+          <div class="strength-card" data-delay="1">
+            <h3>🎯 사용자 가치와 사업 가치를 모두 포용</h3>
+            <p>사용자를 항상 최우선에 두는 것은 기본이고, 회사의 사업적 가치 역시 동일선상에서 중요하게 고려합니다. 좋은 UX와 사용성을 확보하면서도 회사의 사업적 가치를 함께 추구할 수 있음을 경험을 통해 체득하고 있습니다.</p>
+          </div>
+          <div class="strength-card" data-delay="2">
+            <h3>🎯 UX 일반, 서비스 기획, 비즈니스 전략까지</h3>
+            <p>네이버에서 사용자 리서치, UX 컨설팅, 화면 설계 등 UX 기본 역량을 키웠고, LINE에서 서비스 기획과 성장 오퍼레이션, 빈브라더스에서 B2C·B2B IT 경험, 카카오에서 상위 사업 전략 가시화와 매출원 고도화에 몰입해왔습니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="projects">
+      <div class="container">
+        <span class="section-label">Major Projects</span>
+        <h2 class="section-title">주요 과제</h2>
+
+        <article class="project" data-delay="0">
+          <h3>파편화된 서비스의 통합</h3>
+          <p class="meta">카카오 · 광고 비즈니스 부문</p>
+          <div class="problem">
+            <strong>🤔 문제</strong>
+            <p>광고, 채널, 예약, 커머스 등 각기 분리된 사이트에 사업자 유저가 매번 새로 가입해야 했고, 사이트 간 기능 연결이 없어 홍보 시나리오를 뒷받침하기 어려웠습니다.</p>
+          </div>
+          <div class="solution">
+            <strong>💡 해결</strong>
+            <p>가입과 회원 체계를 통합하고, 약관을 간소화해 동의·필수 정보 입력 동선을 최소화했습니다. 유예 기간을 두어 기존 유저 이탈 없이 100% 신규 회원 체계로 전환했고, 이후 전체 통합 과정에 지속 관여해 통합 시스템 구축을 완료했습니다.</p>
+          </div>
+        </article>
+
+        <article class="project" data-delay="1">
+          <h3>사용성 기반의 정기구독 서비스</h3>
+          <p class="meta">빈브라더스</p>
+          <div class="problem">
+            <strong>🤔 문제</strong>
+            <p>원두 정기 발송·카카오톡 상담 주문 시스템이 있었지만 신규 고객 리텐션이 낮았고, '내 원두가 언제 떨어질지 모른다'는 불안과 '상담이 귀찮다'는 니즈가 있었습니다.</p>
+          </div>
+          <div class="solution">
+            <strong>💡 해결</strong>
+            <p>웹 원터치 주문·배송 시스템을 구축하고, 카카오톡을 진입점으로 접근성을 높였습니다. 정기 결제 도입으로 200% 이상 월매출 성장, LTV는 약 3배 성장을 달성했습니다.</p>
+          </div>
+        </article>
+
+        <article class="project" data-delay="2">
+          <h3>모바일 메신저 내 SNS 구축과 활성화</h3>
+          <p class="meta">LINE</p>
+          <div class="problem">
+            <strong>🤔 문제</strong>
+            <p>초기 LINE의 수익원은 이모티콘·공식 채널뿐이었고, 사용자 거부감 없이 광고 지면을 확보하기 어려웠습니다.</p>
+          </div>
+          <div class="solution">
+            <strong>💡 해결</strong>
+            <p>메신저 안에 콘텐츠 피드형 SNS '타임라인'을 메인 서비스로 구축하고 디스플레이 광고를 탑재해 주요 매출원으로 기여했습니다. 그룹 소셜 게시판, 대만·태국 미디어/뉴스 지면 구성으로 사업부 광고 매출에도 기여했습니다.</p>
+          </div>
+        </article>
+
+        <article class="project" data-delay="3">
+          <h3>태국 O2O 서비스 구축 — LINE MAN</h3>
+          <p class="meta">LINE 태국 지사</p>
+          <div class="problem">
+            <strong>🤔 문제</strong>
+            <p>로컬 오피스의 첫 자체 과제로 음식 주문배달 서비스를 론칭하기로 했으나, 시스템/DB·주문 처리·앱·배달을 담당한 회사가 각각 달라 의사결정 병목과 속도 저하가 발생했습니다.</p>
+          </div>
+          <div class="solution">
+            <strong>💡 해결</strong>
+            <p>본사 파견 PM으로 유저 저니·시나리오 기반 화면으로 컨센서스를 맞추고, 세 회사 협업이 혼란 없이 진행되도록 기획/설계해 LINE MAN을 성공 오픈했습니다. 현재 태국 배달/배송 시장의 키 플레이어로 성장해 있습니다.</p>
+          </div>
+        </article>
+
+        <article class="project" data-delay="4">
+          <h3>전사 UX 라이팅 체계 구축</h3>
+          <p class="meta">카카오</p>
+          <div class="problem">
+            <strong>🤔 문제</strong>
+            <p>서비스별 텍스트 톤이 제각각이라 유저가 서비스를 오갈 때마다 새로 적응해야 했고, 담당자마다 표현을 새로 만드는 비효율이 있었습니다.</p>
+          </div>
+          <div class="solution">
+            <strong>💡 해결</strong>
+            <p>카카오톡 본질을 '대화', '전국민의 서비스', '매일의 플랫폼'으로 정의하고 보이스 퍼소나를 추출해 전사 UX 라이팅 가이드라인을 수립·배포했습니다. DO/DON'T 사례를 결합해 배포·교육하고, 조직 전체가 성장하는 체계를 마련했습니다.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="container">
+        <p>긴 글 읽어주셔서 감사합니다.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>홍원범 · UX 스페셜리스트</p>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var timelineItems = document.querySelectorAll('#timeline li');
+      var cards = document.querySelectorAll('.strength-card, .project');
+      var sections = document.querySelectorAll('section');
+      var scrollProgress = document.getElementById('scrollProgress');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var observerOptions = { root: null, rootMargin: '0px 0px -80px 0px', threshold: 0.1 };
+      var sectionObserverOptions = { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 };
+
+      function onIntersect(entries, observer) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        });
+      }
+
+      function onSectionInView(entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('section-in-view');
+          } else {
+            entry.target.classList.remove('section-in-view');
+          }
+        });
+      }
+
+      var observer = new IntersectionObserver(onIntersect, observerOptions);
+      var sectionObserver = new IntersectionObserver(onSectionInView, sectionObserverOptions);
+
+      timelineItems.forEach(function (el, i) {
+        el.style.animationDelay = (i * 0.08) + 's';
+        observer.observe(el);
+      });
+
+      cards.forEach(function (el) {
+        var delay = el.getAttribute('data-delay');
+        if (delay !== null) el.style.animationDelay = (Number(delay) * 0.1) + 's';
+        observer.observe(el);
+      });
+
+      sections.forEach(function (section) {
+        sectionObserver.observe(section);
+      });
+
+      // 스크롤 진행도 (UX: 읽기 진행도 시각화)
+      function updateScrollProgress() {
+        var docEl = document.documentElement;
+        var scrollTop = docEl.scrollTop;
+        var scrollHeight = docEl.scrollHeight - docEl.clientHeight;
+        var percent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        scrollProgress.style.width = percent + '%';
+        scrollProgress.setAttribute('aria-valuenow', Math.round(percent));
+        scrollProgress.setAttribute('aria-valuemin', 0);
+        scrollProgress.setAttribute('aria-valuemax', 100);
+      }
+      window.addEventListener('scroll', function () {
+        if (reduceMotion) return;
+        requestAnimationFrame(updateScrollProgress);
+      }, { passive: true });
+      updateScrollProgress();
+    })();
+  </script>
+</body>
+</html>
